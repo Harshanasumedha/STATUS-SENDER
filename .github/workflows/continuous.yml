@@ -1,9 +1,6 @@
 name: Continuous Workflow
 
 on:
-  schedule:
-    # Runs every 6 hours
-    - cron: '0 */6 * * *'
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -20,7 +17,15 @@ jobs:
           node-version: '14'
 
       - name: Install dependencies
-        run: npm install || yarn install
+        run: |
+          if [ -f package-lock.json ]; then
+            npm install
+          elif [ -f yarn.lock ]; then
+            yarn install
+          else
+            echo "No package manager lock file found."
+            exit 1
+          fi
 
       - name: Run build
         run: npm run build
